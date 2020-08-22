@@ -20,7 +20,7 @@
  ******************************************************************************************/
 #pragma once
 #include <queue>
-
+#include"Vei2.h"
 class Mouse
 {
 	friend class MainWindow;
@@ -96,6 +96,7 @@ public:
 	Mouse( const Mouse& ) = delete;
 	Mouse& operator=( const Mouse& ) = delete;
 	std::pair<int,int> GetPos() const;
+	Vei2 GetPos1() const;
 	int GetPosX() const;
 	int GetPosY() const;
 	bool LeftIsPressed() const;

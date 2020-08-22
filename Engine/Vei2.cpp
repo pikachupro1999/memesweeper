@@ -57,3 +57,8 @@ int Vei2::GetLengthSq() const
 {
 	return x * x + y * y;
 }
+
+Vei2 Vei2::adaptpos() const
+{
+	return Vei2(int(x / 15), int(y / 15));
+}

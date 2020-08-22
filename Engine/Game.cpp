@@ -20,6 +20,7 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
+#include "SpriteCodex.h"
 
 Game::Game( MainWindow& wnd )
 	:
@@ -38,8 +39,25 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
+	if (!isover)
+	{
+		if (!bombispawn)
+		{
+			board.spawnbomb();
+			bombispawn = true;
+		}
+		board.update();
+		board.change(wnd.mouse);
+	}
 }
 
 void Game::ComposeFrame()
 {
+	if (!isover)
+	{
+		board.draw(gfx);
+	}
+	else {
+		SpriteCodex::
+	}
 }

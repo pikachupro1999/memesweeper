@@ -23,6 +23,7 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Graphics.h"
+#include"mines.h"
 
 class Game
 {
@@ -43,4 +44,7 @@ private:
 	/********************************/
 	/*  User Variables              */
 	/********************************/
+	bool isover = false;
+	mines board;
+	bool bombispawn = false;
 };
