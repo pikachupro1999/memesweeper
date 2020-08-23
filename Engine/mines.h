@@ -5,23 +5,27 @@
 #include"Vei2.h"
 #include<random>
 class mines
-{
+{  private:
 	class cell {
 	public:
+		enum class type {
+			Hidden,
+			Release,
+			Flag
+		};
 		cell() = default;
 	    cell(const Vei2& a);
 		void init(const Vei2&a);
 		bool hasbomb1();
 		void setbomb();
 		void draw(Graphics& gfx);
-		void changestate(Mouse& mo);
+		void setrelease();
+		void setflag();
 		void setvalue(int a);
+		int getvalue();
+		type gettype();
+		void settype();
 	private:
-		enum class type {
-			Hidden,
-			Release,
-			Flag
-		};
 		Vei2 pos;
 		type state = type::Hidden;
 		bool hasbomb = false;
@@ -33,6 +37,7 @@ public:
 	void draw(Graphics& gfx);
 	void change(Mouse& mo1);
 	void update();
+	void update2(int i,int j);
 	~mines();
 private:
 	std::random_device rd;
@@ -43,6 +48,7 @@ private:
 	static int constexpr height = 30;
 	static int constexpr celledge = 15;
 	cell bombcell[width*height];
-	int nbomb=40;
+	int nbomb=200;
+	bool isupdate[width*height] = { false };
 };
 

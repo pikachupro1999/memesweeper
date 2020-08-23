@@ -58,6 +58,5 @@ void Game::ComposeFrame()
 		board.draw(gfx);
 	}
 	else {
-		SpriteCodex::
 	}
 }

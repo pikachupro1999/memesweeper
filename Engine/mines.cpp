@@ -32,11 +32,26 @@ void mines::draw(Graphics& gfx)
 			bombcell[i*height + j].draw(gfx);
 }
 
-void mines::change(Mouse& mo1)
+void mines::change(Mouse & mo1)
 {
-	const Vei2 poscur = mo1.GetPos1();
-	const Vei2 poscur1 = poscur.adaptpos();
-	bombcell[poscur1.x*height + poscur1.y].changestate(mo1);
+
+	while (!mo1.IsEmpty())
+	{
+		const Mouse::Event e = mo1.Read();
+		const Vei2 a = mo1.GetPos1();
+		const Vei2 b = a.adaptpos();
+		if (e.GetType() == Mouse::Event::Type::LPress)
+		{
+			
+			bombcell[b.x*width + b.y].setrelease();
+			mines::update2(b.x, b.y);
+			
+		}
+		if (e.GetType() == Mouse::Event::Type::RPress)
+		{
+			bombcell[b.x*width + b.y].setflag();
+		}
+	}
 
 }
 
@@ -141,6 +156,86 @@ void mines::update()
 		}
 }
 
+void mines::update2(int i, int j)
+{
+	if ((!bombcell[i*width + j].hasbomb1()) && (bombcell[i*width + j].getvalue() == 0))
+	{
+		isupdate[i*width + j] = true;
+		if ((i - 1 >= 0) && (i - 1 < width) && (j - 1 >= 0) && (j - 1 < height))
+		{
+			if (!isupdate[(i - 1)*width + j - 1])
+			{
+				update2(i - 1, j - 1);
+			}
+			bombcell[(i - 1)*width + j - 1].settype();
+		}
+
+		if ((i - 1 >= 0) && (i - 1 < width) && (j >= 0) && (j < height))
+		{  
+			if (!isupdate[(i - 1)*width + j])
+			{
+				update2(i - 1, j );
+			}
+			bombcell[(i - 1)*width + j].settype();
+
+		}
+		if ((i - 1 >= 0) && (i - 1 < width) && (j + 1 >= 0) && (j + 1 < height))
+		{   
+			if (!isupdate[(i - 1)*width + j + 1])
+			{
+				update2(i - 1, j + 1);
+			}
+			bombcell[(i - 1)*width + j + 1].settype();
+
+		}
+		if ((i >= 0) && (i < width) && (j - 1 >= 0) && (j - 1 < height))
+		{   
+			if (!isupdate[(i)*width + j - 1])
+			{
+				update2(i , j - 1);
+			}
+			bombcell[(i)*width + j - 1].settype();
+
+		}
+		if ((i >= 0) && (i < width) && (j + 1 >= 0) && (j + 1 < height))
+		{   
+			if (!isupdate[(i )*width + j + 1])
+			{
+				update2(i , j + 1);
+			}
+			bombcell[(i)*width + j + 1].settype();
+		}
+
+		if ((i + 1 >= 0) && (i + 1 < width) && (j - 1 >= 0) && (j - 1 < height))
+		{   
+			if (!isupdate[(i + 1)*width + j - 1])
+			{
+				update2(i + 1, j - 1);
+			}
+			bombcell[(i + 1)*width + j - 1].settype();
+		}
+		if ((i + 1 >= 0) && (i + 1 < width) && (j >= 0) && (j < height))
+		{   
+			if (!isupdate[(i + 1)*width + j])
+			{
+				update2(i + 1, j );
+			}
+			bombcell[(i + 1)*width + j - 1].settype();
+
+		}
+		if ((i + 1 >= 0) && (i + 1 < width) && (j + 1 >= 0) && (j + 1 < height))
+		{   
+			if (!isupdate[(i +1)*width + j + 1])
+			{
+				update2(i + 1, j + 1);
+			}
+			bombcell[(i + 1)*width + j - 1].settype();
+		}
+
+	}
+}
+	
+
 
 mines::~mines()
 {
@@ -165,36 +260,25 @@ void mines::cell::setbomb()
 	hasbomb = true;
 }
 
-void mines::cell::changestate( Mouse& mo)
-{
-	while (!mo.IsEmpty())
-	{
-		const Mouse::Event e = mo.Read();
-		if (e.GetType() == Mouse::Event::Type::LPress)
-	{
-			if (state == type::Hidden)
-			{
-			 state = type::Release;
-		    }
-		}
-		 if (e.GetType() == Mouse::Event::Type::RPress)
-		{    
-			if (state == type::Hidden)
-			{
-				state = type::Flag;
-			}
-			else if (state == type::Flag)
-			{
-				state = type::Hidden;
-			}
-		}
-	}
-}
-
 void mines::cell::setvalue(int a)
 {  
 	assert(a >= 0 && a <= 8);
 	x = a;
+}
+
+int mines::cell::getvalue()
+{
+	return x;
+}
+
+mines::cell::type mines::cell::gettype()
+{
+	return state;
+}
+
+void mines::cell::settype()
+{
+	state = type::Release;
 }
 
 void mines::cell::draw(Graphics & gfx)
@@ -202,13 +286,22 @@ void mines::cell::draw(Graphics & gfx)
 		switch (state)
 		{
 		case mines::cell::type::Hidden:
+			for (int i = 0; i <= 15; i++)
+				for (int j = 0; j <= 15; j++)
+					gfx.PutPixel(pos.x + i, pos.y + j, Color(77,77,77));
 			SpriteCodex::DrawTileButton(pos, gfx);
 			break;
 		case mines::cell::type::Flag:
+			for (int i = 0; i <= 15; i++)
+				for (int j = 0; j <= 15; j++)
+					gfx.PutPixel(pos.x + i, pos.y + j, Color(77, 77, 77));
 			SpriteCodex::DrawTile0(pos, gfx);
 			SpriteCodex::DrawTileFlag(pos, gfx);
 			break;
 		case mines::cell::type::Release:
+			for (int i = 0; i <= 15; i++)
+				for (int j = 0; j <= 15; j++)
+					gfx.PutPixel(pos.x + i, pos.y + j, Color(200, 200, 200));
 			if (!hasbomb)
 			{
 				switch (x)
@@ -251,4 +344,17 @@ void mines::cell::draw(Graphics & gfx)
 		{}
 		}
 	}
+
+void mines::cell::setrelease()
+{
+	state = type::Release;
+}
+
+void mines::cell::setflag()
+{
+	state = type::Flag;
+}
+
+
+
 
