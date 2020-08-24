@@ -229,7 +229,7 @@ void mines::update2(int i, int j)
 			{
 				update2(i + 1, j + 1);
 			}
-			bombcell[(i + 1)*width + j - 1].settype();
+			bombcell[(i + 1)*width + j + 1].settype();
 		}
 
 	}

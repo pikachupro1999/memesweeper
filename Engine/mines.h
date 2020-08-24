@@ -26,7 +26,7 @@ class mines
 		type gettype();
 		void settype();
 	private:
-		Vei2 pos;
+		Vei2 pos=Vei2(0,0);
 		type state = type::Hidden;
 		bool hasbomb = false;
 		int x=1;
