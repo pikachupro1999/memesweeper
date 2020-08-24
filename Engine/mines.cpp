@@ -42,7 +42,6 @@ void mines::change(Mouse & mo1)
 		const Vei2 b = a.adaptpos();
 		if (e.GetType() == Mouse::Event::Type::LPress)
 		{
-			
 			bombcell[b.x*width + b.y].setrelease();
 			mines::update2(b.x, b.y);
 			
@@ -55,110 +54,36 @@ void mines::change(Mouse & mo1)
 
 }
 
-void mines::update()
+void mines::update(int i,int j)
 {
-	int count;
-	for(int i=0;i<width;++i)
-		for (int j = 0; j < height; ++j)
+	if ((i >= 0 && i < width) && (j >= 0) && (j < height)&& (!isupdate1[i*width+j]))
+	{
+		isupdate1[i * width + j] = true;
+		if (bombcell[i * width + j].hasbomb1())
 		{
-			count = 0;
-			if (i == 0)
-			{
-				if (j == 0)
-				{
-					if (bombcell[1].hasbomb1())
-						count++;
-					if (bombcell[height].hasbomb1())
-						count++;
-					bombcell[0].setvalue(count);
-				}
-				else if(j==width-1) {
-					if (bombcell[width-2].hasbomb1())
-						count++;
-					if (bombcell[2*width-1].hasbomb1())
-						count++;
-					bombcell[width - 1].setvalue(count);
-					
-				}
-				else
-				{
-					if (bombcell[j-1].hasbomb1())
-						count++;
-					if (bombcell[j+1].hasbomb1())
-						count++;
-					if (bombcell[width+j].hasbomb1())
-						count++;
-					bombcell[j].setvalue(count);
-				}
-			}
-			else if (i == height - 1)
-			{ 
-				if (j == 0)
-				{
-					if (bombcell[(i-1)*width].hasbomb1())
-						count++;
-					if (bombcell[i*width+1].hasbomb1())
-						count++;
-					bombcell[i*width].setvalue(count);
-				}
-				else if (j == width - 1) {
-					if (bombcell[i*width+j-1].hasbomb1())
-						count++;
-					if (bombcell[(i-1)*width+j].hasbomb1())
-						count++;
-					bombcell[(i+1)*(j+1)-1].setvalue(count);
-
-				}
-				else
-				{
-					if (bombcell[i*width+j+1].hasbomb1())
-						count++;
-					if (bombcell[i*width + j + j-1].hasbomb1())
-						count++;
-					if (bombcell[(i-1)*width+j].hasbomb1())
-						count++;
-					bombcell[i*width+j].setvalue(count);
-				}
-			}
-			else {
-				if (j == 0)
-				{
-					if (bombcell[i*width + j + 1].hasbomb1())
-						count++;
-					if (bombcell[(i+1)*width + j].hasbomb1())
-						count++;
-					if (bombcell[(i - 1)*width + j].hasbomb1())
-						count++;
-					bombcell[i*width+j].setvalue(count);
-				}
-				else if (j == width - 1)
-				{
-					if (bombcell[i*width + j -1].hasbomb1())
-						count++;
-					if (bombcell[(i+1)*width + j ].hasbomb1())
-						count++;
-					if (bombcell[(i - 1)*width + j].hasbomb1())
-						count++;
-					bombcell[i*width+j].setvalue(count);
-				}
-				else {
-					if (bombcell[i*width + j - 1].hasbomb1())
-						count++;
-					if (bombcell[i*width + j + 1].hasbomb1())
-						count++;
-					if (bombcell[(i + 1)*width + j].hasbomb1())
-						count++;
-					if (bombcell[(i - 1)*width + j].hasbomb1())
-						count++;
-					bombcell[i*width + j].setvalue(count);
-				}
-			}
+			lazysetvalue(i-1, j-1);
+			lazysetvalue(i-1, j);
+			lazysetvalue(i-1, j+1);
+			lazysetvalue(i, j-1);
+			lazysetvalue(i, j+1);
+			lazysetvalue(i+1, j-1);
+			lazysetvalue(i+1, j);
+			lazysetvalue(i+1, j+1);
 		}
+		update(i - 1, j-1);
+		update(i - 1, j);
+		update(i - 1, j + 1);
+		update(i, j - 1);
+		update(i, j + 1);
+		update(i + 1, j - 1);
+		update(i + 1, j);
+		update(i + 1, j + 1);
+	}
 }
 
 void mines::update2(int i, int j)
 {
-	if ((!bombcell[i*width + j].hasbomb1()) && (bombcell[i*width + j].getvalue() == 0))
+	if ((!bombcell[i*width + j].hasbomb1()) && (bombcell[i*width + j].getvalue() == 0)&&(!isupdate[i*width+j]))
 	{
 		isupdate[i*width + j] = true;
 		if ((i - 1 >= 0) && (i - 1 < width) && (j - 1 >= 0) && (j - 1 < height))
@@ -234,9 +159,15 @@ void mines::update2(int i, int j)
 
 	}
 }
+
+void mines::lazysetvalue(int i, int j)
+{
+	if ((i >= 0) && (i < width) && (j >= 0) && (j < height))
+	{
+		bombcell[i * width + j].setvalue();
+	}
+}
 	
-
-
 mines::~mines()
 {
 }
@@ -260,10 +191,9 @@ void mines::cell::setbomb()
 	hasbomb = true;
 }
 
-void mines::cell::setvalue(int a)
+void mines::cell::setvalue()
 {  
-	assert(a >= 0 && a <= 8);
-	x = a;
+	x++;
 }
 
 int mines::cell::getvalue()
@@ -278,7 +208,10 @@ mines::cell::type mines::cell::gettype()
 
 void mines::cell::settype()
 {
-	state = type::Release;
+	if (!hasbomb1())
+	{
+		state = type::Release;
+	}
 }
 
 void mines::cell::draw(Graphics & gfx)

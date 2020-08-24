@@ -46,7 +46,11 @@ void Game::UpdateModel()
 			board.spawnbomb();
 			bombispawn = true;
 		}
-		board.update();
+		if (!isupdate)
+		{
+			board.update(0,0);
+			isupdate = true;
+		}
 		board.change(wnd.mouse);
 	}
 }

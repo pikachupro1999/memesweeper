@@ -47,4 +47,5 @@ private:
 	bool isover = false;
 	mines board;
 	bool bombispawn = false;
+	bool isupdate = false;
 };

@@ -21,7 +21,7 @@ class mines
 		void draw(Graphics& gfx);
 		void setrelease();
 		void setflag();
-		void setvalue(int a);
+		void setvalue();
 		int getvalue();
 		type gettype();
 		void settype();
@@ -29,15 +29,16 @@ class mines
 		Vei2 pos=Vei2(0,0);
 		type state = type::Hidden;
 		bool hasbomb = false;
-		int x=1;
+		int x=0;
 };
 public:
 	mines();
 	void spawnbomb();
 	void draw(Graphics& gfx);
 	void change(Mouse& mo1);
-	void update();
+	void update(int x,int y);
 	void update2(int i,int j);
+	void lazysetvalue(int i, int j);
 	~mines();
 private:
 	std::random_device rd;
@@ -50,5 +51,6 @@ private:
 	cell bombcell[width*height];
 	int nbomb=200;
 	bool isupdate[width*height] = { false };
+	bool isupdate1[width * height] = { false };
 };
 
